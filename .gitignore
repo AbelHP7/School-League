@@ -1,0 +1,28 @@
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Multimedia
+media/
+frontend/media/
+backend/media/
+
+# Base de datos
+torneo_db
+*.sql
+
+# Entorno de desarrollo Windows
+.vscode/
+

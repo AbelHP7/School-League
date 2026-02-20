@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div class="bg-slate-800 px-6 py-4 border-b border-slate-700 flex justify-between items-center">
+            <h2 class="text-white font-bold text-lg">Acta del Partido</h2>
+            <span class="text-slate-400 text-sm"><i class="fa-regular fa-clock mr-1"></i> Jornada {{ match.round }}</span>
+        </div>
+
+        <div class="p-8">
+            <form method="post" class="space-y-8">
+                {% csrf_token %}
+
+                <!-- Scoreboard Input -->
+                <div class="flex items-center justify-center gap-8 mb-8">
+                    <!-- Home -->
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-slate-700 mb-2 truncate max-w-[120px]">
+                            {{ match.home_team.name }}
+                        </div>
+                        <input type="number" name="home_score" value="{{ match.home_score }}" min="0" class="w-20 h-20 text-center text-4xl font-black rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all">
+                    </div>
+
+                    <div class="text-xl font-bold text-slate-300">-</div>
+
+                    <!-- Away -->
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-slate-700 mb-2 truncate max-w-[120px]">
+                            {{ match.away_team.name }}
+                        </div>
+                        <input type="number" name="away_score" value="{{ match.away_score }}" min="0" class="w-20 h-20 text-center text-4xl font-black rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all">
+                    </div>
+                </div>
+
+                <!-- Status Selector -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Estado del Partido</label>
+                    <select name="status" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-3">
+                        <option value="SCHEDULED" 
+                            {% if match.status == 'SCHEDULED' %}selected{% endif %}>
+                            📅 Programado
+                        </option>
+                        <option value="PLAYING" 
+                            {% if match.status == 'PLAYING' %}selected{% endif %}>
+                            ⚽ En Juego
+                        </option>
+                        <option value="FINISHED" 
+                            {% if match.status == 'FINISHED' %}selected{% endif %}>
+                            🏁 Finalizado (Cerrar Acta)
+                        </option>
+                        <option value="SUSPENDED" 
+                            {% if match.status == 'SUSPENDED' %}selected{% endif %}>
+                            ⛔ Suspendido
+                        </option>
+                    </select>
+                    <p class="text-xs text-slate-500 mt-2">
+                        <i class="fa-solid fa-triangle-exclamation text-yellow-500"></i>
+                        Atención: Si marcas "Finalizado", el acta se bloqueará.
+                    </p>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="flex-1 bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/30">
+                        Guardar Acta
+                    </button>
+                    <a href="{% url 'matches' %}" class="px-6 py-3 rounded-lg font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

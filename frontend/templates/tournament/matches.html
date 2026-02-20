@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-800 flex items-center gap-3">
+            <i class="fa-solid fa-calendar-day text-blue-600"></i> Calendario de Partidos
+        </h1>
+
+        {% if user.is_staff %}
+        <a href="{% url 'generate_matches' %}"
+            onclick="return confirm('¿Estás seguro? Esto creará partidos para todos los equipos.')"
+            class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all">
+            <i class="fa-solid fa-magic-wand-sparkles mr-2"></i>Generar Jornadas
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="space-y-8">
+        {% regroup matches by round as match_rounds %}
+
+        {% for round in match_rounds %}
+        <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+            <div class="bg-indigo-600 px-6 py-3 text-white font-bold flex justify-between items-center">
+                <span>Jornada {{ round.grouper }}</span>
+                <span class="text-xs bg-indigo-500 px-2 py-1 rounded text-indigo-100">
+                    {{ round.list.0.match_date|date:"d M Y" }} approx
+                </span>
+            </div>
+            <div class="divide-y divide-slate-100">
+                {% for match in round.list %}
+                <div
+                    class="p-4 hover:bg-slate-50 transition-colors flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center justify-center flex-1 w-full sm:w-auto gap-8 mb-4 sm:mb-0">
+                        <!-- Home -->
+                        <div class="flex flex-col items-center w-32 text-center">
+                            {% if match.home_team.shield %}
+                            <img src="{{ match.home_team.shield.url }}" class="w-16 h-16 object-contain mb-2">
+                            {% else %}
+                            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-2">
+                                <i class="fa-solid fa-shield text-slate-300 text-2xl"></i>
+                            </div>
+                            {% endif %}
+                            <span class="font-bold text-slate-800 leading-tight">{{ match.home_team.name }}</span>
+                        </div>
+
+                        <!-- Score / VS -->
+                        <div class="text-center relative">
+                            {% if match.status == 'FINISHED' %}
+                            <div class="text-3xl font-black text-slate-800 tracking-tighter">
+                                {{ match.home_score }} - {{ match.away_score }}
+                            </div>
+                            <span
+                                class="bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 inline-block">FINAL</span>
+                            {% elif match.status == 'PLAYING' %}
+                            <div class="text-3xl font-black text-slate-800 tracking-tighter">
+                                {{ match.home_score }} - {{ match.away_score }}
+                            </div>
+                            <span
+                                class="bg-green-100 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 inline-block animate-pulse">EN
+                                JUEGO</span>
+                            {% else %}
+                            <div class="text-xl font-bold text-slate-300">VS</div>
+                            <div class="text-xs text-slate-400 mt-1">{{ match.match_date|date:"H:i" }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Away -->
+                        <div class="flex flex-col items-center w-32 text-center">
+                            {% if match.away_team.shield %}
+                            <img src="{{ match.away_team.shield.url }}" class="w-16 h-16 object-contain mb-2">
+                            {% else %}
+                            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-2">
+                                <i class="fa-solid fa-shield text-slate-300 text-2xl"></i>
+                            </div>
+                            {% endif %}
+                            <span class="font-bold text-slate-800 leading-tight">{{ match.away_team.name }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="w-full sm:w-auto flex justify-center sm:justify-end">
+                        {% if user.role == 'REFEREE' or user.is_staff or user.role == 'TEACHER' %}
+                        <a href="{% url 'match_edit' match.id %}"
+                            class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-indigo-600 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-12 bg-white rounded-xl border-2 border-dashed border-slate-200">
+            <div class="inline-block p-4 rounded-full bg-slate-50 mb-4">
+                <i class="fa-regular fa-calendar-xmark text-4xl text-slate-300"></i>
+            </div>
+            <h3 class="text-lg font-medium text-slate-900">No hay partidos programados</h3>
+            <p class="text-slate-500">Genera las jornadas para empezar la temporada.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
